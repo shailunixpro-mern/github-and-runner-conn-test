@@ -13,7 +13,9 @@ jobs:
           echo "Instance: ${{ secrets.SERVICENOW_INSTANCE }}"
           echo "User: ${{ secrets.SERVICENOW_USER }}"
           echo "SysID: ${{ secrets.SERVICENOW_SYS_ID }}"
-          echo "Password length: ${#{{ secrets.SERVICENOW_PASSWORD }}}"
+          PASSWORD="${{ secrets.SERVICENOW_PASSWORD }}"
+          echo "Password length: ${#PASSWORD}"
+
       - name: Test ServiceNow connectivity and create incident
         run: |
           set +e
@@ -39,3 +41,4 @@ jobs:
             echo "$RESPONSE"
             exit 1
           fi
+		  
