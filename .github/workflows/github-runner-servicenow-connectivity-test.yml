@@ -13,16 +13,14 @@ jobs:
           set +e  # Disable exit on error to capture curl exit code
           
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
-            -u "${{ secrets.SERVICENOW_USER }}:${{ secrets.SERVICENOW_PASSWORD }}" \
+            -H "X-UserToken: ${{ secrets.SERVICENOW_USER_TOKEN }}" \
             -X POST \
-            "https://${{ secrets.SERVICENOW_INSTANCE }}/api/now/table/incident" \
+            "https://${{ secrets.SERVICENOW_INSTANCE }}/api/sn_sc/servicecatalog/items/${{ secrets.SERVICENOW_SYS_ID }}/submit_producer" \
             -H "Content-Type: application/json" \
             -H "Accept: application/json" \
             -d '{
                   "short_description":"GitHub Actions Connectivity Test",
-                  "description":"Incident created from GitHub Actions Ubuntu Runner",
-                  "urgency":"3",
-                  "impact":"3"
+                  "description":"Incident created from GitHub Actions Ubuntu Runner"
                 }')
           
           CURL_EXIT=$?
