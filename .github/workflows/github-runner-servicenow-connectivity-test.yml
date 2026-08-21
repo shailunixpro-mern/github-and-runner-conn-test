@@ -11,16 +11,15 @@ jobs:
       - name: Test ServiceNow connectivity and create incident
         run: |
           set +e
-          RESPONSE=$(curl -k -s -w "\nHTTP_STATUS:%{http_code}" \
-            -H "X-UserToken: ${{ secrets.SERVICENOW_USER_TOKEN }}" \
+          RESPONSE=$(curl -k -v -s -w "\nHTTP_STATUS:%{http_code}" \
+            -u "${{ secrets.SERVICENOW_USERNAME }}:${{ secrets.SERVICENOW_PASSWORD }}" \
             -X POST \
-            "https://${{ secrets.SERVICENOW_INSTANCE }}/api/sn_sc/servicecatalog/items/${{ secrets.SERVICENOW_SYS_ID }}/submit_producer" \
+            "https://${{ secrets.SERVICENOW_INSTANCE }}.service-now.com/api/sn_sc/servicecatalog/items/${{ secrets.SERVICENOW_SYS_ID }}/submit_producer" \
             -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
             -d '{
                   "short_description":"GitHub Actions Connectivity Test",
                   "description":"Incident created from GitHub Actions Ubuntu Runner"
-                }')
+                }' 2>&1)
           CURL_EXIT=$?
           set -e
           
@@ -29,7 +28,6 @@ jobs:
           echo "HTTP Status Code: $HTTP_STATUS"
           echo "Curl Exit Code: $CURL_EXIT"
           
-          # Add detailed error response
           if [ $CURL_EXIT -ne 0 ] || [[ "$HTTP_STATUS" =~ ^[45] ]]; then
             echo "Error response body:"
             echo "$RESPONSE"
