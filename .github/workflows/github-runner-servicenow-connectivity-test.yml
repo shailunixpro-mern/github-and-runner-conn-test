@@ -1,26 +1,31 @@
-name: ServiceNow Connectivity Test
-
-on:
-  workflow_dispatch:
-
-jobs:
-  create-incident:
-    runs-on: BamAgentSrvLinux
-
-    steps:
-      - name: Test ServiceNow connectivity and create incident
-        run: |
-          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
-            -u "${{ secrets.SERVICENOW_USER }}:${{ secrets.SERVICENOW_PASSWORD }}" \
-            -X POST \
-            "https://${{ secrets.SERVICENOW_INSTANCE }}/api/now/table/incident" \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{
-                  "short_description":"GitHub Actions Connectivity Test",
-                  "description":"Incident created from GitHub Actions Ubuntu Runner",
-                  "urgency":"3",
-                  "impact":"3"
-                }')
-
-          echo "$RESPONSE"
+- name: Test ServiceNow connectivity and create incident
+  run: |
+    set +e  # Disable exit on error to capture curl exit code
+    
+    RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+      -u "${{ secrets.SERVICENOW_USER }}:${{ secrets.SERVICENOW_PASSWORD }}" \
+      -X POST \
+      "https://${{ secrets.SERVICENOW_INSTANCE }}/api/now/table/incident" \
+      -H "Content-Type: application/json" \
+      -H "Accept: application/json" \
+      -d '{
+            "short_description":"GitHub Actions Connectivity Test",
+            "description":"Incident created from GitHub Actions Ubuntu Runner",
+            "urgency":"3",
+            "impact":"3"
+          }')
+    
+    CURL_EXIT=$?
+    set -e
+    
+    echo "$RESPONSE"
+    
+    # Extract HTTP status code
+    HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d':' -f2)
+    echo "HTTP Status Code: $HTTP_STATUS"
+    echo "Curl Exit Code: $CURL_EXIT"
+    
+    # Exit with failure if curl failed or HTTP status indicates error
+    if [ $CURL_EXIT -ne 0 ] || [[ "$HTTP_STATUS" =~ ^[45] ]]; then
+      exit 1
+    fi
