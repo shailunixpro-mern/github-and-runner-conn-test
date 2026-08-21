@@ -10,12 +10,6 @@ jobs:
     steps:
       - name: Test ServiceNow connectivity and create incident
         run: |
-          # Debug: Check if we can resolve the hostname
-          nslookup ${{ secrets.SERVICENOW_INSTANCE }}
-          
-          # Debug: Test basic connectivity
-          #ping -c 1 ${{ secrets.SERVICENOW_INSTANCE }}
-          
           set +e
           RESPONSE=$(curl -k -s -w "\nHTTP_STATUS:%{http_code}" \
             -H "X-UserToken: ${{ secrets.SERVICENOW_USER_TOKEN }}" \
@@ -31,13 +25,13 @@ jobs:
           set -e
           
           echo "$RESPONSE"
-          
-          # Extract HTTP status code
           HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d':' -f2)
           echo "HTTP Status Code: $HTTP_STATUS"
           echo "Curl Exit Code: $CURL_EXIT"
           
-          # Exit with failure if curl failed or HTTP status indicates error
+          # Add detailed error response
           if [ $CURL_EXIT -ne 0 ] || [[ "$HTTP_STATUS" =~ ^[45] ]]; then
+            echo "Error response body:"
+            echo "$RESPONSE"
             exit 1
           fi
