@@ -10,8 +10,13 @@ jobs:
     steps:
       - name: Test ServiceNow connectivity and create incident
         run: |
-          set +e  # Disable exit on error to capture curl exit code
+          # Debug: Check if we can resolve the hostname
+          nslookup ${{ secrets.SERVICENOW_INSTANCE }}
           
+          # Debug: Test basic connectivity
+          ping -c 1 ${{ secrets.SERVICENOW_INSTANCE }}
+          
+          set +e
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -H "X-UserToken: ${{ secrets.SERVICENOW_USER_TOKEN }}" \
             -X POST \
@@ -22,7 +27,6 @@ jobs:
                   "short_description":"GitHub Actions Connectivity Test",
                   "description":"Incident created from GitHub Actions Ubuntu Runner"
                 }')
-          
           CURL_EXIT=$?
           set -e
           
