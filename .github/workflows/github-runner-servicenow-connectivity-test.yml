@@ -1,0 +1,26 @@
+name: ServiceNow Connectivity Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-incident:
+    runs-on: BamAgentSrvLinux
+
+    steps:
+      - name: Test ServiceNow connectivity and create incident
+        run: |
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+            -u "${{ secrets.SERVICENOW_USER }}:${{ secrets.SERVICENOW_PASSWORD }}" \
+            -X POST \
+            "https://${{ secrets.SERVICENOW_INSTANCE }}/api/now/table/incident" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d '{
+                  "short_description":"GitHub Actions Connectivity Test",
+                  "description":"Incident created from GitHub Actions Ubuntu Runner",
+                  "urgency":"3",
+                  "impact":"3"
+                }')
+
+          echo "$RESPONSE"
