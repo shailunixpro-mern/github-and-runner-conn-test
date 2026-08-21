@@ -15,12 +15,16 @@ jobs:
           echo "SysID: ${{ secrets.SERVICENOW_SYS_ID }}"
           PASSWORD="${{ secrets.SERVICENOW_PASSWORD }}"
           echo "Password length: ${#PASSWORD}"
+          echo "Password bytes: $(echo -n "$PASSWORD" | wc -c)"
 
       - name: Test ServiceNow connectivity and create incident
         run: |
           set +e
+          # Store password to avoid any potential truncation
+          PASSWORD="${{ secrets.SERVICENOW_PASSWORD }}"
+          
           RESPONSE=$(curl -k -v -s -w "\nHTTP_STATUS:%{http_code}" \
-            --user "${{ secrets.SERVICENOW_USER }}:${{ secrets.SERVICENOW_PASSWORD }}" \
+            --user "${{ secrets.SERVICENOW_USER }}:${PASSWORD}" \
             -X POST \
             "https://${{ secrets.SERVICENOW_INSTANCE }}/api/sn_sc/servicecatalog/items/${{ secrets.SERVICENOW_SYS_ID }}/submit_producer" \
             -H "Content-Type: application/json" \
