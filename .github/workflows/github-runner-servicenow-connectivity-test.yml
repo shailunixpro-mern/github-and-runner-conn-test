@@ -14,10 +14,10 @@ jobs:
           nslookup ${{ secrets.SERVICENOW_INSTANCE }}
           
           # Debug: Test basic connectivity
-          #ping -c 1 ${{ secrets.SERVICENOW_INSTANCE }}
+          ping -c 1 ${{ secrets.SERVICENOW_INSTANCE }}
           
           set +e
-          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
+          RESPONSE=$(curl -k -s -w "\nHTTP_STATUS:%{http_code}" \
             -H "X-UserToken: ${{ secrets.SERVICENOW_USER_TOKEN }}" \
             -X POST \
             "https://${{ secrets.SERVICENOW_INSTANCE }}/api/sn_sc/servicecatalog/items/${{ secrets.SERVICENOW_SYS_ID }}/submit_producer" \
