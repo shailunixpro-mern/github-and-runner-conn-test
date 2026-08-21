@@ -14,7 +14,7 @@ jobs:
           nslookup ${{ secrets.SERVICENOW_INSTANCE }}
           
           # Debug: Test basic connectivity
-          ping -c 1 ${{ secrets.SERVICENOW_INSTANCE }}
+          #ping -c 1 ${{ secrets.SERVICENOW_INSTANCE }}
           
           set +e
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
