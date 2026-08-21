@@ -1,0 +1,27 @@
+name: Runner Connectivity Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  connectivity-test:
+    runs-on: BamAgentSrvLinux
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Display Runner Information
+        run: |
+          echo "Runner Name: $RUNNER_NAME"
+          hostname
+          whoami
+          uname -a
+
+      - name: Test Internet Connectivity
+        run: |
+          ping -c 4 github.com
+
+      - name: Verify GitHub Communication
+        run: |
+          echo "Runner successfully received and executed this job."
