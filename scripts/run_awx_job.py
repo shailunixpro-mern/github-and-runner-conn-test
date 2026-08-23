@@ -83,6 +83,38 @@ def get_job_name(job_id):
 
     return response.json()["name"]
 
+from datetime import datetime
+
+def sanitize_job_name(job_name):
+    """
+    Replace spaces with underscores for directory creation.
+    """
+    return job_name.replace(" ", "_")
+    
+def get_job_details(job_id):
+
+    response = session.get(
+        f"{AWX_URL}/api/v2/jobs/{job_id}/"
+    )
+    response.raise_for_status()
+
+    return response.json()
+    
+def get_safe_start_time(started):
+
+    if not started:
+        return "unknown_start_time"
+
+    try:
+        dt = datetime.fromisoformat(
+            started.replace("Z", "+00:00")
+        )
+
+        return dt.strftime("%Y%m%d_%H%M%S")
+
+    except Exception:
+        return "unknown_start_time"    
+
 
 def download_stdout(job_id, log_file):
 
@@ -114,13 +146,25 @@ def main():
 
     wait_for_completion(job_id)
 
-    job_name = get_job_name(job_id)
-
+    job_details = get_job_details(job_id)
+    
+    job_name = sanitize_job_name(
+        job_details["name"]
+    )
+    
+    job_start_time = get_safe_start_time(
+        job_details.get("started")
+    )
+    
     log_dir = f"/var/log/awx-job-log/{job_name}"
+    
     os.makedirs(log_dir, exist_ok=True)
-
-    log_file = f"{log_dir}/joboutput.log"
-
+    
+    log_file = (
+        f"{log_dir}/"
+        f"{job_id}_joboutput_{job_start_time}.log"
+    )
+    
     download_stdout(job_id, log_file)
 
     print(f"Log saved at: {log_file}")

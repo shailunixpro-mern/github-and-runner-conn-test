@@ -33,6 +33,7 @@ jobs:
       - name: Execute AWX Job
         run: |
           sudo mkdir -p /var/log/awx-job-log
+          sudo chmod 777 /var/log/awx-job-log
           python scripts/run_awx_job.py
 
       - name: Upload AWX Logs
