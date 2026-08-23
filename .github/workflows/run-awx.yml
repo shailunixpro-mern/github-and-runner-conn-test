@@ -1,0 +1,42 @@
+name: Execute AWX Job
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-awx-template:
+
+    runs-on: BamAgentSrvLinux
+
+    env:
+      AWX_URL: ${{ secrets.AWX_URL }}
+      AWX_USERNAME: ${{ secrets.AWX_USERNAME }}
+      AWX_PASSWORD: ${{ secrets.AWX_PASSWORD }}
+
+      JOB_TEMPLATE_NAME: "Get Ubuntu Hostname Job Template"
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Execute AWX Job
+        run: |
+          sudo mkdir -p /var/log/awx-job-log
+          python scripts/run_awx_job.py
+
+      - name: Upload AWX Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: awx-job-logs
+          path: /var/log/awx-job-log
