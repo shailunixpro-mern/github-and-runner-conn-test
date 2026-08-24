@@ -146,7 +146,7 @@ def create_incident(job_id):
 def update_existing_incident(sys_id, work_notes, job_id):
 
     url = (
-        f"{SNOW_INSTANCE}"
+            f"https://{SNOW_INSTANCE}"
         f"/api/now/table/incident/{sys_id}"
     )
 
@@ -176,7 +176,7 @@ def update_existing_incident(sys_id, work_notes, job_id):
 def close_incident(sys_id):
 
     url = (
-        f"{SNOW_INSTANCE}"
+            f"https://{SNOW_INSTANCE}"
         f"/api/now/table/incident/{sys_id}"
     )
 
