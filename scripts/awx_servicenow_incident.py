@@ -237,23 +237,21 @@ def main():
         "Creating ServiceNow incident..."
     )
 
-    created_incident = create_incident(
-        job_id
-    )
+    created_incident = create_incident(job_id)
 
-    created_number = created_incident["number"]
-
-    print(
-        f"Created Incident: {created_number}"
-    )
+    incident_sys_id = created_incident["sys_id"]
+    incident_number = created_incident["number"]
 
     print(
-        f"Updating configured incident SYS_ID: "
-        f"{SERVICENOW_SYS_ID}"
+        f"Created Incident: {incident_number}"
+    )
+
+    print(
+        f"Incident SYS_ID: {incident_sys_id}"
     )
 
     update_existing_incident(
-        SERVICENOW_SYS_ID,
+        incident_sys_id,
         log_contents,
         job_id
     )
@@ -269,7 +267,7 @@ def main():
         )
 
         close_incident(
-            SERVICENOW_SYS_ID
+            incident_sys_id
         )
 
         print(
