@@ -1,0 +1,38 @@
+name: AWX ServiceNow Incident Handler
+
+on:
+  workflow_dispatch:
+
+jobs:
+  process-awx-job:
+
+    runs-on:
+      - BamAgentSrvLinux
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run AWX ServiceNow Integration
+        env:
+          AWX_URL: ${{ secrets.AWX_URL }}
+          AWX_USERNAME: ${{ secrets.AWX_USERNAME }}
+          AWX_PASSWORD: ${{ secrets.AWX_PASSWORD }}
+
+          SERVICENOW_INSTANCE: ${{ secrets.SERVICENOW_INSTANCE }}
+          SERVICENOW_USER: ${{ secrets.SERVICENOW_USER }}
+          SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
+
+        run: |
+          python scripts/awx_servicenow_incident.py
