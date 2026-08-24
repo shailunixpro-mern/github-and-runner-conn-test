@@ -33,6 +33,7 @@ jobs:
           SERVICENOW_INSTANCE: ${{ secrets.SERVICENOW_INSTANCE }}
           SERVICENOW_USER: ${{ secrets.SERVICENOW_USER }}
           SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
+          SERVICENOW_SYS_ID: ${{ secrets.SERVICENOW_SYS_ID }}  
 
         run: |
           python scripts/awx_servicenow_incident.py
