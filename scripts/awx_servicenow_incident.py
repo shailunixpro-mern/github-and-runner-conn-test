@@ -114,18 +114,26 @@ def create_incident(job_id):
     )
 
     payload = {
-        "short_description": short_description,
-        "description":
-            "This is a Automated job output trigger from AWX"
+        "variables": {
+            "short_description": short_description,
+            "description":
+                "This is a Automated job output trigger from AWX"
+        }
     }
 
-    url = f"{SNOW_INSTANCE}/api/now/table/incident"
+    url = (
+        f"https://{SNOW_INSTANCE}"
+        f"/api/sn_sc/servicecatalog/items/"
+        f"{SERVICENOW_SYS_ID}"
+        f"/submit_producer"
+    )
 
     r = requests.post(
         url,
         auth=(SNOW_USER, SNOW_PASSWORD),
         headers={
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Accept": "application/json"
         },
         json=payload,
         timeout=60
@@ -134,7 +142,6 @@ def create_incident(job_id):
     r.raise_for_status()
 
     return r.json()["result"]
-
 
 def update_existing_incident(sys_id, work_notes, job_id):
 
