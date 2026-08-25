@@ -198,7 +198,7 @@ def close_incident(sys_id):
 
     payload = {
         "incident_state": "7",
-        "state": "7",
+        "state": "6",
         "close_code": "Solved (Permanently)",
         "close_notes":
             "Closed automatically because AWX job completed successfully."
