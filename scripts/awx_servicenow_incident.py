@@ -162,7 +162,8 @@ def update_existing_incident(sys_id, work_notes, job_id):
     }
 
     print("PATCH URL:", url)
-    print("WORK NOTES SIZE:", len(payload["work_notes"]))
+#    print("WORK NOTES SIZE:", len(payload["work_notes"]))
+    print("COMMENTS SIZE:", len(payload["comments"]))
 
     r = requests.patch(
         url,
