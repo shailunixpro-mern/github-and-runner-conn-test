@@ -153,9 +153,12 @@ def update_existing_incident(sys_id, work_notes, job_id):
     )
 
     payload = {
-        "work_notes":
+        "short_description":
+            f"{AWX_TEMPLATE_NAME} - Job id {job_id}",
+        "description":
+            "This is a Automated job output trigger from AWX",    
+        "comments":
             f"AWX Job Output\n\n{work_notes[:15000]}"
-
     }
 
     print("PATCH URL:", url)
@@ -234,7 +237,8 @@ def verify_incident(sys_id):
     url = (
         f"https://{SNOW_INSTANCE}"
         f"/api/now/table/incident/{sys_id}"
-        f"?sysparm_fields=number,work_notes"
+        f"?sysparm_display_value=true"
+        f"&sysparm_fields=number,comments,work_notes"
     )
 
     r = requests.get(
