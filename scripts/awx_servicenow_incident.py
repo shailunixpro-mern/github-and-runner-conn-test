@@ -1,5 +1,6 @@
 import os
 import requests
+import time
 from datetime import datetime
 
 AWX_TEMPLATE_NAME = "Get Ubuntu Hostname Job Template"
@@ -253,11 +254,11 @@ def main():
 #        log_path
 #    )
 
-     log_contents = read_log_file(log_path)
+    log_contents = read_log_file(log_path)
 
-     print(f"Log file length: {len(log_contents)} chars")
-     print("First 200 characters:")
-     print(log_contents[:200])
+    print(f"Log file length: {len(log_contents)} chars")
+    print("First 200 characters:")
+    print(log_contents[:200])
 
     print(
         "Creating ServiceNow incident..."
@@ -286,7 +287,7 @@ def main():
         f"{incident['number']}"
     )
 
-   result = update_existing_incident(
+    result = update_existing_incident(
         incident_sys_id,
         log_contents,
         job_id
