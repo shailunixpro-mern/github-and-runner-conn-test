@@ -208,11 +208,15 @@ def close_incident(sys_id):
         url,
         auth=(SNOW_USER, SNOW_PASSWORD),
         headers={
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Accept": "application/json"
         },
         json=payload,
         timeout=60
     )
+
+    print("CLOSE STATUS:", r.status_code)
+    print("CLOSE RESPONSE:", r.text)
 
     r.raise_for_status()
 
@@ -251,6 +255,24 @@ def verify_incident(sys_id):
     r.raise_for_status()
 
     print("VERIFY INCIDENT:")
+    print(r.text)
+
+def verify_state(sys_id):
+
+    url = (
+        f"https://{SNOW_INSTANCE}"
+        f"/api/now/table/incident/{sys_id}"
+        f"?sysparm_fields=number,state,incident_state"
+    )
+
+    r = requests.get(
+        url,
+        auth=(SNOW_USER, SNOW_PASSWORD),
+        headers={"Accept": "application/json"}
+    )
+
+    r.raise_for_status()
+
     print(r.text)
 
 def main():
@@ -347,6 +369,9 @@ def main():
         print(
             "ServiceNow incident closed."
         )
+
+        time.sleep(3)
+        verify_state(incident_sys_id)
 
     else:
 
