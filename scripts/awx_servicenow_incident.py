@@ -143,34 +143,37 @@ def create_incident(job_id):
 
     return r.json()["result"]
 
+
 def update_existing_incident(sys_id, work_notes, job_id):
 
     url = (
-            f"https://{SNOW_INSTANCE}"
+        f"https://{SNOW_INSTANCE}"
         f"/api/now/table/incident/{sys_id}"
     )
 
     payload = {
-        "short_description":
-            f"{AWX_TEMPLATE_NAME} - Job id {job_id}",
+        "work_notes":
+            f"AWX Job Output\n\n{work_notes[:15000]}"
 
-        "description":
-            "This is a Automated job output trigger from AWX",
-
-        "work_notes": work_notes
     }
 
     r = requests.patch(
         url,
         auth=(SNOW_USER, SNOW_PASSWORD),
         headers={
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Accept": "application/json"
         },
         json=payload,
         timeout=60
     )
 
+    print("PATCH status:", r.status_code)
+    print("PATCH response:", r.text)
+
     r.raise_for_status()
+
+    return r.json()
 
 
 def close_incident(sys_id):
@@ -199,6 +202,23 @@ def close_incident(sys_id):
     )
 
     r.raise_for_status()
+
+def get_incident(sys_id):
+
+    url = (
+        f"https://{SNOW_INSTANCE}"
+        f"/api/now/table/incident/{sys_id}"
+    )
+
+    r = requests.get(
+        url,
+        auth=(SNOW_USER, SNOW_PASSWORD),
+        headers={"Accept":"application/json"}
+    )
+
+    r.raise_for_status()
+
+    return r.json()["result"]
 
 
 def main():
@@ -229,15 +249,24 @@ def main():
         f" {log_path}"
     )
 
-    log_contents = read_log_file(
-        log_path
-    )
+#    log_contents = read_log_file(
+#        log_path
+#    )
+
+     log_contents = read_log_file(log_path)
+
+     print(f"Log file length: {len(log_contents)} chars")
+     print("First 200 characters:")
+     print(log_contents[:200])
 
     print(
         "Creating ServiceNow incident..."
     )
 
     created_incident = create_incident(job_id)
+
+    print("Created Incident Response:")
+    print(created_incident)
 
     incident_sys_id = created_incident["sys_id"]
     incident_number = created_incident["number"]
@@ -250,11 +279,22 @@ def main():
         f"Incident SYS_ID: {incident_sys_id}"
     )
 
-    update_existing_incident(
+    incident = get_incident(incident_sys_id)
+
+    print(
+        f"Incident Number: "
+        f"{incident['number']}"
+    )
+
+   result = update_existing_incident(
         incident_sys_id,
         log_contents,
         job_id
     )
+
+    print(result)
+
+    time.sleep(5)
 
     print(
         "Work notes updated."
