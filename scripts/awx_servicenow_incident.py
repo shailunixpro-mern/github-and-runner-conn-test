@@ -158,6 +158,9 @@ def update_existing_incident(sys_id, work_notes, job_id):
 
     }
 
+    print("PATCH URL:", url)
+    print("WORK NOTES SIZE:", len(payload["work_notes"]))
+
     r = requests.patch(
         url,
         auth=(SNOW_USER, SNOW_PASSWORD),
@@ -171,6 +174,11 @@ def update_existing_incident(sys_id, work_notes, job_id):
 
     print("PATCH status:", r.status_code)
     print("PATCH response:", r.text)
+
+    try:
+        print(r.json())
+    except Exception:
+        print(r.text)
 
     r.raise_for_status()
 
@@ -221,6 +229,24 @@ def get_incident(sys_id):
 
     return r.json()["result"]
 
+def verify_incident(sys_id):
+
+    url = (
+        f"https://{SNOW_INSTANCE}"
+        f"/api/now/table/incident/{sys_id}"
+        f"?sysparm_fields=number,work_notes"
+    )
+
+    r = requests.get(
+        url,
+        auth=(SNOW_USER, SNOW_PASSWORD),
+        headers={"Accept": "application/json"}
+    )
+
+    r.raise_for_status()
+
+    print("VERIFY INCIDENT:")
+    print(r.text)
 
 def main():
 
@@ -300,6 +326,8 @@ def main():
     print(
         "Work notes updated."
     )
+
+    verify_incident(incident_sys_id)
 
     if job_status.lower() != "failed":
 
